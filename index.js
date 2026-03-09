@@ -5,6 +5,12 @@ import { dbConnection, db } from "./configs/db.js";
 import { initServerUser } from "./configs/app.js";
 import { setupAssociations } from "./src/associations.js";
 
+import "./src/users/user.model.js";
+import "./src/reports/report.model.js";
+import "./src/zones/zone.model.js";
+import "./src/comments/comment.model.js";
+import "./src/ratings/rating.model.js";
+
 const PORT = process.env.PORT || 3006;
 
 const startServerUser = async () => {

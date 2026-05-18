@@ -26,7 +26,6 @@ export const updateMyProfile = async (req, res) => {
             return res.status(404).json({ message: "Usuario no encontrado" });
         }
 
-        // Solo campos editables: nombre, apellido, telefono
         const editableFields = ['nombre', 'apellido', 'telefono'];
         const updates = {};
         editableFields.forEach(field => {

@@ -7,6 +7,7 @@ import {
     getReportStats,
     getSeverityStats,
     getReportsByStatus,
+    getReportById,
     deleteMyReport,
     updateMyReport
 } from "../reports/report.controller.js";
@@ -24,6 +25,8 @@ router.get("/stats", authenticateUser, getReportStats);
 router.get("/severityStats", authenticateUser, getSeverityStats);
 
 router.get("/reportsByStatus/:status", authenticateUser, getReportsByStatus);
+
+router.get("/:id", authenticateUser, getReportById);
 
 router.delete("/:id", authenticateUser, deleteMyReport);
 

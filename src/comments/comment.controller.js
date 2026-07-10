@@ -112,3 +112,14 @@ export const updateMyComment = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+export const getCommentsByReport = async (req, res) => {
+    try {
+        const comments = await Comment.findAll({
+            where: { report_id: req.params.reportId }
+        });
+        res.json(comments);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};

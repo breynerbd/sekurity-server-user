@@ -182,3 +182,15 @@ export const getReportsByStatus = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+export const getReportById = async (req, res) => {
+    try {
+        const report = await Report.findByPk(req.params.id, { include: [Zone] });
+        if (!report) {
+            return res.status(404).json({ message: "Reporte no encontrado" });
+        }
+        res.json(report);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};

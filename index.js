@@ -19,14 +19,14 @@ const startServerUser = async () => {
         setupAssociations();
 
         await db.sync({ alter: true });
-        console.log("✅ Tablas USER sincronizadas");
+        console.log("Tablas USER sincronizadas");
 
         const app = initServerUser();
         app.listen(PORT, () => {
-            console.log(`🚀 Sekurity USER API running at http://localhost:${PORT}/sekurity/v1`);
+            console.log(`Sekurity USER API running at http://localhost:${PORT}/sekurity/v1`);
         });
     } catch (error) {
-        console.error("❌ Error starting USER server:", error);
+        console.error("Error starting USER server:", error);
         process.exit(1);
     }
 };

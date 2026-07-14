@@ -19,9 +19,9 @@ export const db = new Sequelize(
 export const dbConnection = async () => {
     try {
         await db.authenticate();
-        console.log("✅ Server-User | PostgreSQL connection successful.");
+        console.log("Server-User | PostgreSQL connection successful.");
     } catch (error) {
-        console.error("❌ Server-User | Connection failed:", error.message);
+        console.error("Server-User | Connection failed:", error.message);
         process.exit(1);
     }
 };

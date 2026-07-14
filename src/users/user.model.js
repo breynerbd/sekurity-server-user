@@ -15,21 +15,32 @@ export const User = db.define("users", {
         unique: true
     },
 
-    nombre: {
+    name: {
         type: DataTypes.STRING,
         allowNull: false
     },
 
-    apellido: {
+    surname: {
         type: DataTypes.STRING
     },
 
-    correo: {
+    username: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true
+    },
+
+    email: {
         type: DataTypes.STRING,
         allowNull: false
     },
 
-    telefono: {
+    password: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+
+    phone: {
         type: DataTypes.STRING
     },
 

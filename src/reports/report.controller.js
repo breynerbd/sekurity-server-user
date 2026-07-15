@@ -5,12 +5,10 @@ import { getInternalUser } from "../utils/getInternalUser.js";
 import { Sequelize } from "sequelize";
 
 export const createReport = async (req, res) => {
-
     try {
-
         const internalUser = await getInternalUser({
             auth_id: req.user.id,
-            correo: req.user.email
+            email: req.user.email // Corregido ✅
         });
 
         const report = await Report.create({
@@ -28,31 +26,38 @@ export const createReport = async (req, res) => {
     }
 };
 
-//obtener mis reportes
+// obtener mis reportes
 export const getMyReports = async (req, res) => {
+    try {
+        const internalUser = await getInternalUser({
+            auth_id: req.user.id,
+            email: req.user.email // Corregido ✅ y envuelto en try/catch
+        });
 
-    const internalUser = await getInternalUser({
-        auth_id: req.user.id,
-        correo: req.user.email
-    });
+        const reports = await Report.findAll({
+            where: { user_id: internalUser.id },
+            include: [Zone]
+        });
 
-    const reports = await Report.findAll({
-        where: { user_id: internalUser.id },
-        include: [Zone]
-    });
-
-    res.json(reports);
+        res.json(reports);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 };
 
-//obtener todos los reportes
+// obtener todos los reportes
 export const getAllReports = async (req, res) => {
-    const reports = await Report.findAll({
-        include: [Zone]
-    });
-    res.json(reports);
+    try {
+        const reports = await Report.findAll({
+            include: [Zone]
+        });
+        res.json(reports);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 };
 
-//obtener estadisticas de los reportes
+// obtener estadisticas de los reportes
 export const getReportStats = async (req, res) => {
     try {
         const stats = await Report.findAll({
@@ -74,7 +79,7 @@ export const getReportStats = async (req, res) => {
     }
 };
 
-//estadisticas de nivel de severidad
+// estadisticas de nivel de severidad
 export const getSeverityStats = async (req, res) => {
     try {
         const stats = await Report.findAll({
@@ -92,12 +97,12 @@ export const getSeverityStats = async (req, res) => {
     }
 };
 
-//eliminar solo mis reportes
+// eliminar solo mis reportes
 export const deleteMyReport = async (req, res) => {
     try {
         const internalUser = await getInternalUser({
             auth_id: req.user.id,
-            correo: req.user.email
+            email: req.user.email // Corregido ✅
         });
 
         const report = await Report.findByPk(req.params.id);
@@ -118,12 +123,12 @@ export const deleteMyReport = async (req, res) => {
     }
 };
 
-//actualizar solo mis reportes
+// actualizar solo mis reportes
 export const updateMyReport = async (req, res) => {
     try {
         const internalUser = await getInternalUser({
             auth_id: req.user.id,
-            correo: req.user.email
+            email: req.user.email // Corregido ✅
         });
 
         const report = await Report.findByPk(req.params.id);
@@ -136,7 +141,6 @@ export const updateMyReport = async (req, res) => {
             return res.status(403).json({ message: "Este reporte no es tuyo" });
         }
 
-        // Campos permitidos
         const allowedFields = ["title", "description", "incident_type", "severity_level", "zone_id"];
         const updateData = {};
         for (const field of allowedFields) {
@@ -145,7 +149,6 @@ export const updateMyReport = async (req, res) => {
             }
         }
 
-        // Validar zone_id
         if (updateData.zone_id) {
             const zoneExists = await Zone.findByPk(updateData.zone_id);
             if (!zoneExists) {
@@ -153,7 +156,6 @@ export const updateMyReport = async (req, res) => {
             }
         }
 
-        // Validar severity_level
         if (updateData.severity_level) {
             const validLevels = ["LOW", "MEDIUM", "HIGH"];
             if (!validLevels.includes(updateData.severity_level)) {
@@ -170,7 +172,7 @@ export const updateMyReport = async (req, res) => {
     }
 };
 
-//obtener reportes por estado
+// obtener reportes por estado
 export const getReportsByStatus = async (req, res) => {
     try {
         const reports = await Report.findAll({

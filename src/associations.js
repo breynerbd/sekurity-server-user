@@ -35,4 +35,8 @@ export const setupAssociations = () => {
     User.hasMany(Rating, { foreignKey: "user_id" });
     Rating.belongsTo(User, { foreignKey: "user_id" });
 
+    // ZONE -> RATING
+Zone.hasMany(Rating, { foreignKey: "zone_id" });
+Rating.belongsTo(Zone, { foreignKey: "zone_id" });
+
 };

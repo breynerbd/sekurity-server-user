@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import { db } from "../../configs/db.js";
 
-export const Rating = db.define("ratings", {
+export const Rating = db.define("ratings_v2", {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -31,12 +31,15 @@ export const Rating = db.define("ratings", {
 }, {
     timestamps: true,
     validate: {
-        // Evita crear un rating "huérfano" o uno que apunte a ambos a la vez
         exactlyOneTarget() {
-            if (!this.report_id && !this.zone_id) {
+            // Aseguramos obtener el valor real ya sea de dataValues o del contexto directo
+            const reportId = this.report_id || (this.dataValues && this.dataValues.report_id);
+            const zoneId = this.zone_id || (this.dataValues && this.dataValues.zone_id);
+
+            if (!reportId && !zoneId) {
                 throw new Error("Debes indicar report_id o zone_id");
             }
-            if (this.report_id && this.zone_id) {
+            if (reportId && zoneId) {
                 throw new Error("Un rating no puede calificar un reporte y una zona a la vez");
             }
         }

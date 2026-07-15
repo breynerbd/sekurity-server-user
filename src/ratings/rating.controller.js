@@ -7,7 +7,7 @@ export const rateReport = async (req, res) => {
     try {
         const internalUser = await getInternalUser({
             auth_id: req.user.id,
-            correo: req.user.email
+            email: req.user.email // Corregido ✅
         });
 
         const rating = await Rating.create({
@@ -22,12 +22,12 @@ export const rateReport = async (req, res) => {
     }
 };
 
-//obtener mis calificaciones
+// obtener mis calificaciones
 export const getMyRatings = async (req, res) => {
     try {
         const internalUser = await getInternalUser({
             auth_id: req.user.id,
-            correo: req.user.email
+            email: req.user.email // Corregido ✅
         });
 
         const ratings = await Rating.findAll({
@@ -45,7 +45,7 @@ export const rateZone = async (req, res) => {
     try {
         const internalUser = await getInternalUser({
             auth_id: req.user.id,
-            correo: req.user.email
+            email: req.user.email // Corregido ✅
         });
 
         const zone = await Zone.findByPk(req.params.zoneId);
@@ -54,14 +54,15 @@ export const rateZone = async (req, res) => {
         }
 
         const rating = await Rating.create({
-            score: req.body.score,
-            comment: req.body.comment,
-            zone_id: req.params.zoneId,
+            score: req.body.score ? Number(req.body.score) : null,
+            comment: req.body.comment || null,
+            zone_id: req.params.zoneId ? parseInt(req.params.zoneId, 10) : null,
             user_id: internalUser.id
         });
 
         res.status(201).json(rating);
     } catch (error) {
+        console.error("❌ Error detallado en rateZone:", error);
         res.status(500).json({ message: error.message });
     }
 };

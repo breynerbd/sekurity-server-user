@@ -2,31 +2,32 @@ import { DataTypes } from "sequelize";
 import { db } from "../../configs/db.js";
 
 export const Comment = db.define("comments", {
-
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true
+        autoIncrement: true,
     },
-
     content: {
         type: DataTypes.TEXT,
         allowNull: false,
-        validate: {
-            len: [1, 1000]
-        }
     },
-
     user_id: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
     },
-
     report_id: {
         type: DataTypes.INTEGER,
-        allowNull: false
-    }
-
+        allowNull: false,
+    },
+    parent_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+            model: "comments",
+            key: "id",
+        },
+        onDelete: "CASCADE",
+    },
 }, {
-    timestamps: true
+    timestamps: true,
 });

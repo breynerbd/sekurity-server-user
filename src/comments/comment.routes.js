@@ -6,7 +6,8 @@ import {
     updateMyComment,
     deleteMyComment,
     getAllComments,
-    getCommentsByReport
+    getCommentsByReport,
+    reactToComment
 } from "../comments/comment.controller.js";
 
 const router = Router();
@@ -23,4 +24,5 @@ router.delete("/:id", authenticateUser, deleteMyComment);
 
 router.get("/byReport/:reportId", authenticateUser, getCommentsByReport);
 
+router.post("/:commentId/react", authenticateUser, reactToComment);
 export default router;

@@ -16,6 +16,14 @@ export const Zone = db.define("zones", {
 
     description: {
         type: DataTypes.STRING
+    },
+    latitude: {
+        type: DataTypes.FLOAT,
+        allowNull: true
+    },
+    longitude: {
+        type: DataTypes.FLOAT,
+        allowNull: true
     }
 
 }, {

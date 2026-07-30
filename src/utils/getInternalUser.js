@@ -1,11 +1,11 @@
 import { User } from "../users/user.model.js";
 
-export const getInternalUser = async ({ auth_id, email }) => {
+export const getInternalUser = async ({ auth_id, email, correo }) => {
+    const userEmail = email || correo;
 
-    if (!auth_id || !email) {
+    if (!auth_id || !userEmail) {
         throw new Error("auth_id y email son requeridos");
     }
-
 
     const user = await User.findOne({
         where: {
@@ -13,11 +13,9 @@ export const getInternalUser = async ({ auth_id, email }) => {
         }
     });
 
-
     if (!user) {
         throw new Error("Usuario interno no encontrado");
     }
-
 
     return user;
 };

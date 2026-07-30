@@ -3,40 +3,50 @@ import { Report } from "./reports/report.model.js";
 import { Zone } from "./zones/zone.model.js";
 import { Comment } from "./comments/comment.model.js";
 import { Rating } from "./ratings/rating.model.js";
+import { CommentReaction } from "./comments/commentReaction.model.js";
+import { ReportReaction } from "./reports/reportReaction.model.js";
 
 export const setupAssociations = () => {
-
-    // USER -> REPORT
     User.hasMany(Report, { foreignKey: "user_id" });
     Report.belongsTo(User, { foreignKey: "user_id" });
 
-
-    // ZONE -> REPORT
-    Zone.hasMany(Report, { foreignKey: "zone_id" });
+    // ─── ACTUALIZADO: Agregamos los alias "reports" y "ratings" a la Zona ───
+    Zone.hasMany(Report, { foreignKey: "zone_id", as: "reports" });
     Report.belongsTo(Zone, { foreignKey: "zone_id" });
 
+    Zone.hasMany(Rating, { foreignKey: "zone_id", as: "ratings" });
+    Rating.belongsTo(Zone, { foreignKey: "zone_id" });
+    // -----------------------------------------------------------------------
 
-    // REPORT -> COMMENT
     Report.hasMany(Comment, { foreignKey: "report_id" });
     Comment.belongsTo(Report, { foreignKey: "report_id" });
 
-
-    // USER -> COMMENT
     User.hasMany(Comment, { foreignKey: "user_id" });
     Comment.belongsTo(User, { foreignKey: "user_id" });
 
-
-    // REPORT -> RATING
     Report.hasMany(Rating, { foreignKey: "report_id" });
     Rating.belongsTo(Report, { foreignKey: "report_id" });
 
-
-    // USER -> RATING
     User.hasMany(Rating, { foreignKey: "user_id" });
     Rating.belongsTo(User, { foreignKey: "user_id" });
 
-    // ZONE -> RATING
-Zone.hasMany(Rating, { foreignKey: "zone_id" });
-Rating.belongsTo(Zone, { foreignKey: "zone_id" });
+    Comment.hasMany(CommentReaction, { foreignKey: "comment_id", onDelete: "CASCADE" });
+    CommentReaction.belongsTo(Comment, { foreignKey: "comment_id" });
 
+    User.hasMany(CommentReaction, { foreignKey: "user_id", onDelete: "CASCADE" });
+    CommentReaction.belongsTo(User, { foreignKey: "user_id" });
+
+    Comment.hasMany(Comment, {
+        as: 'replies',
+        foreignKey: 'parent_id',
+        onDelete: 'CASCADE'
+    });
+
+    Comment.belongsTo(Comment, {
+        as: 'parent',
+        foreignKey: 'parent_id'
+    });
+
+    Report.hasMany(ReportReaction, { foreignKey: "report_id", as: "report_reactions" });
+    ReportReaction.belongsTo(Report, { foreignKey: "report_id" });
 };

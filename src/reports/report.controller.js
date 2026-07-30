@@ -3,40 +3,98 @@ import { User } from "../users/user.model.js";
 import { Zone } from "../zones/zone.model.js";
 import { getInternalUser } from "../utils/getInternalUser.js";
 import { Sequelize } from "sequelize";
+import { ReportReaction } from "./reportReaction.model.js";
+import { Comment } from "../comments/comment.model.js";
+
 
 export const createReport = async (req, res) => {
     try {
         const internalUser = await getInternalUser({
             auth_id: req.user.id,
-            email: req.user.email // Corregido ✅
+            email: req.user.email
         });
 
         const report = await Report.create({
             title: req.body.title,
             description: req.body.description,
             incident_type: req.body.incident_type,
+            severity_level: req.body.severity_level,
             zone_id: req.body.zone_id,
             user_id: internalUser.id
         });
 
-        res.status(201).json(report);
+        const fullReport = await Report.findByPk(report.id, {
+            include: [Zone, { model: User, attributes: ['id', 'name', 'surname', 'email'] }]
+        });
+
+        res.status(201).json(fullReport);
 
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
-// obtener mis reportes
+export const getAllReports = async (req, res) => {
+    try {
+        const reports = await Report.findAll({
+            include: [
+                Zone,
+                {
+                    model: User,
+                    attributes: ['id', 'name', 'surname', 'email']
+                },
+                {
+                    model: ReportReaction,
+                    as: "report_reactions"
+                },
+                {
+                    model: Comment,
+                    include: [
+                        {
+                            model: User,
+                            attributes: ['id', 'name', 'surname', 'email']
+                        }
+                    ]
+                }
+            ]
+        });
+        res.json(reports);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 export const getMyReports = async (req, res) => {
     try {
         const internalUser = await getInternalUser({
             auth_id: req.user.id,
-            email: req.user.email // Corregido ✅ y envuelto en try/catch
+            email: req.user.email
         });
 
         const reports = await Report.findAll({
             where: { user_id: internalUser.id },
-            include: [Zone]
+            include: [
+                Zone,
+                {
+                    model: User,
+                    attributes: ['id', 'name', 'surname', 'email']
+                },
+                {
+                    model: ReportReaction,
+                    as: "report_reactions",
+                    where: { user_id: internalUser.id },
+                    required: false
+                },
+                {
+                    model: Comment,
+                    include: [
+                        {
+                            model: User,
+                            attributes: ['id', 'name', 'surname', 'email']
+                        }
+                    ]
+                }
+            ]
         });
 
         res.json(reports);
@@ -45,19 +103,6 @@ export const getMyReports = async (req, res) => {
     }
 };
 
-// obtener todos los reportes
-export const getAllReports = async (req, res) => {
-    try {
-        const reports = await Report.findAll({
-            include: [Zone]
-        });
-        res.json(reports);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-
-// obtener estadisticas de los reportes
 export const getReportStats = async (req, res) => {
     try {
         const stats = await Report.findAll({
@@ -79,7 +124,6 @@ export const getReportStats = async (req, res) => {
     }
 };
 
-// estadisticas de nivel de severidad
 export const getSeverityStats = async (req, res) => {
     try {
         const stats = await Report.findAll({
@@ -97,12 +141,11 @@ export const getSeverityStats = async (req, res) => {
     }
 };
 
-// eliminar solo mis reportes
 export const deleteMyReport = async (req, res) => {
     try {
         const internalUser = await getInternalUser({
             auth_id: req.user.id,
-            email: req.user.email // Corregido ✅
+            email: req.user.email
         });
 
         const report = await Report.findByPk(req.params.id);
@@ -123,12 +166,11 @@ export const deleteMyReport = async (req, res) => {
     }
 };
 
-// actualizar solo mis reportes
 export const updateMyReport = async (req, res) => {
     try {
         const internalUser = await getInternalUser({
             auth_id: req.user.id,
-            email: req.user.email // Corregido ✅
+            email: req.user.email
         });
 
         const report = await Report.findByPk(req.params.id);
@@ -165,19 +207,37 @@ export const updateMyReport = async (req, res) => {
 
         await report.update(updateData);
 
-        res.json(report);
+        const updatedReport = await Report.findByPk(report.id, {
+            include: [Zone, { model: User, attributes: ['id', 'name', 'surname', 'email'] }]
+        });
+
+        res.json(updatedReport);
 
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
-// obtener reportes por estado
 export const getReportsByStatus = async (req, res) => {
     try {
         const reports = await Report.findAll({
             where: { status: req.params.status },
-            include: [Zone]
+            include: [
+                Zone,
+                {
+                    model: User,
+                    attributes: ['id', 'name', 'surname', 'email']
+                },
+                {
+                    model: Comment,
+                    include: [
+                        {
+                            model: User,
+                            attributes: ['id', 'name', 'surname', 'email']
+                        }
+                    ]
+                }
+            ]
         });
         res.json(reports);
     } catch (error) {
@@ -187,12 +247,81 @@ export const getReportsByStatus = async (req, res) => {
 
 export const getReportById = async (req, res) => {
     try {
-        const report = await Report.findByPk(req.params.id, { include: [Zone] });
+        const report = await Report.findByPk(req.params.id, {
+            include: [
+                Zone,
+                {
+                    model: User,
+                    attributes: ['id', 'name', 'surname', 'email']
+                },
+                {
+                    model: Comment,
+                    include: [
+                        {
+                            model: User,
+                            attributes: ['id', 'name', 'surname', 'email']
+                        }
+                    ]
+                }
+            ]
+        });
         if (!report) {
             return res.status(404).json({ message: "Reporte no encontrado" });
         }
         res.json(report);
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+};
+
+export const rateReport = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const rawType = req.body.severity_rating ?? req.body.danger_level ?? req.body.severity ?? req.body.type;
+
+        const internalUser = await getInternalUser({
+            auth_id: req.user.id,
+            email: req.user.email
+        });
+
+        if (!internalUser || !internalUser.id) {
+            return res.status(401).json({ message: "No autorizado" });
+        }
+
+        const report = await Report.findByPk(id);
+        if (!report) {
+            return res.status(404).json({ message: "Reporte no encontrado" });
+        }
+
+        if (rawType === null || rawType === undefined || rawType === "") {
+            await ReportReaction.destroy({
+                where: { user_id: internalUser.id, report_id: id }
+            });
+        } else {
+            const reactionType = Number(rawType);
+
+            if (![1, 2, 3].includes(reactionType)) {
+                return res.status(400).json({ message: "Nivel de severidad inválido. Debe ser 1, 2 o 3." });
+            }
+
+            await ReportReaction.upsert({
+                user_id: internalUser.id,
+                report_id: Number(id),
+                type: reactionType
+            });
+        }
+
+        const fullReport = await Report.findByPk(id, {
+            include: [
+                Zone,
+                { model: User, attributes: ['id', 'name', 'surname', 'email'] },
+                { model: ReportReaction, as: "report_reactions" }
+            ]
+        });
+
+        return res.json(fullReport);
+    } catch (error) {
+        console.error("Error en rateReport:", error);
+        return res.status(500).json({ message: error.message || "Error interno del servidor" });
     }
 };

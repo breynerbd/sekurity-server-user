@@ -9,7 +9,8 @@ import {
     getReportsByStatus,
     getReportById,
     deleteMyReport,
-    updateMyReport
+    updateMyReport,
+    rateReport
 } from "../reports/report.controller.js";
 
 const router = Router();
@@ -31,5 +32,7 @@ router.get("/:id", authenticateUser, getReportById);
 router.delete("/:id", authenticateUser, deleteMyReport);
 
 router.put("/:id", authenticateUser, updateMyReport);
+
+router.post("/:id/rate", authenticateUser, rateReport);
 
 export default router;

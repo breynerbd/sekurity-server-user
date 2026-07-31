@@ -1,13 +1,14 @@
 import { Rating } from "./rating.model.js";
 import { Report } from "../reports/report.model.js";
 import { Zone } from "../zones/zone.model.js";
+import { User } from "../users/user.model.js";
 import { getInternalUser } from "../utils/getInternalUser.js";
 
 export const rateReport = async (req, res) => {
     try {
         const internalUser = await getInternalUser({
             auth_id: req.user.id,
-            email: req.user.email // Corregido ✅
+            email: req.user.email
         });
 
         const rating = await Rating.create({
@@ -27,7 +28,7 @@ export const getMyRatings = async (req, res) => {
     try {
         const internalUser = await getInternalUser({
             auth_id: req.user.id,
-            email: req.user.email // Corregido ✅
+            email: req.user.email
         });
 
         const ratings = await Rating.findAll({
@@ -45,13 +46,8 @@ export const rateZone = async (req, res) => {
     try {
         const internalUser = await getInternalUser({
             auth_id: req.user.id,
-            email: req.user.email // Corregido ✅
+            email: req.user.email
         });
-
-        const zone = await Zone.findByPk(req.params.zoneId);
-        if (!zone) {
-            return res.status(404).json({ message: "Zona no encontrada" });
-        }
 
         const rating = await Rating.create({
             score: req.body.score ? Number(req.body.score) : null,
@@ -70,10 +66,19 @@ export const rateZone = async (req, res) => {
 export const getRatingsByZone = async (req, res) => {
     try {
         const ratings = await Rating.findAll({
-            where: { zone_id: req.params.zoneId }
+            where: { zone_id: req.params.zoneId },
+            include: [
+                {
+                    model: User,
+                    as: "user",
+                    attributes: ['id', 'name', 'surname', 'email', 'username']
+                }
+            ]
         });
+
         res.json(ratings);
     } catch (error) {
+        console.error("❌ Error en getRatingsByZone:", error);
         res.status(500).json({ message: error.message });
     }
 };

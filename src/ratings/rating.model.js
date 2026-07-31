@@ -22,17 +22,17 @@ export const Rating = db.define("ratings_v2", {
     },
     report_id: {
         type: DataTypes.INTEGER,
-        allowNull: true   // antes era obligatorio
+        allowNull: true
     },
     zone_id: {
         type: DataTypes.INTEGER,
-        allowNull: true   // nuevo
+        allowNull: true
     }
 }, {
+    tableName: "ratings_v2",
     timestamps: true,
     validate: {
         exactlyOneTarget() {
-            // Aseguramos obtener el valor real ya sea de dataValues o del contexto directo
             const reportId = this.report_id || (this.dataValues && this.dataValues.report_id);
             const zoneId = this.zone_id || (this.dataValues && this.dataValues.zone_id);
 

@@ -10,13 +10,14 @@ export const setupAssociations = () => {
     User.hasMany(Report, { foreignKey: "user_id" });
     Report.belongsTo(User, { foreignKey: "user_id" });
 
-    // ─── ACTUALIZADO: Agregamos los alias "reports" y "ratings" a la Zona ───
     Zone.hasMany(Report, { foreignKey: "zone_id", as: "reports" });
     Report.belongsTo(Zone, { foreignKey: "zone_id" });
 
+    User.hasMany(Rating, { foreignKey: "user_id", as: "ratings" });
+    Rating.belongsTo(User, { foreignKey: "user_id", as: "user" });
+
     Zone.hasMany(Rating, { foreignKey: "zone_id", as: "ratings" });
-    Rating.belongsTo(Zone, { foreignKey: "zone_id" });
-    // -----------------------------------------------------------------------
+    Rating.belongsTo(Zone, { foreignKey: "zone_id", as: "zone" });
 
     Report.hasMany(Comment, { foreignKey: "report_id" });
     Comment.belongsTo(Report, { foreignKey: "report_id" });

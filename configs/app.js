@@ -21,6 +21,8 @@ export const initServerUser = () => {
     const app = express();
     const BASE_URL = "/sekurity/v1/user";
 
+    app.set("trust proxy", 1);
+
     app.use(express.json());
     app.use(cors(corsOptions));
     app.use(helmet(helmetConfiguration));
